@@ -193,7 +193,7 @@ function MenuColumn({ items, startIndex, quantities, handleQuantityChange }) {
 
 function Receipt({ purchasedItems, total, onClose }) {
   return (
-    <div className="receipt" style={{ maxWidth: "456px", margin: "0 auto" }}>
+    <div className="receipt" style={{ maxWidth: "250px", margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <img src={logo} alt="Logo" style={{ width: "200px" }} />
       </div>
@@ -228,7 +228,7 @@ function Receipt({ purchasedItems, total, onClose }) {
         <thead>
           <tr>
             <th style={{ textAlign: "left" }}>Item</th>
-            <th style={{ textAlign: "center" }}>Quantity</th>
+            <th style={{ textAlign: "center" }}>Qty</th>
             <th style={{ textAlign: "right" }}>Subtotal</th>
           </tr>
         </thead>
