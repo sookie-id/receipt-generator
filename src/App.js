@@ -75,31 +75,82 @@ export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
     e.target.reset();
   };
 
+  // Split the itemList into two columns
+  const mid = Math.ceil(itemList.length / 2);
+  const leftItems = itemList.slice(0, mid);
+  const rightItems = itemList.slice(mid);
+
   return (
     <>
       <h2>Menu</h2>
-      <table>
-        <thead>
-          <tr>
-            <th style={{ textAlign: "left" }}>Name</th>
-            <th style={{ textAlign: "right" }}>Price</th>
-            <th style={{ textAlign: "center" }}>Quantity</th>
-          </tr>
-        </thead>
-        <tbody>
-          {itemList.map((item, index) => (
-            <tr key={index}>
-              <td>{item.name}</td>
-              <td style={{ textAlign: "right" }}>Rp{item.price.toLocaleString()}</td>
-              <td>
-                <button onClick={() => handleQuantityChange(index, -1)}>-</button>
-                <span style={{ margin: "0 8px" }}>{quantities[index]}</span>
-                <button onClick={() => handleQuantityChange(index, 1)}>+</button>
-              </td>
+      <div style={{ display: "flex", gap: "32px" }}>
+        {/* Left Column */}
+        <table style={{ flex: 1 }}>
+          <thead>
+            <tr>
+              <th style={{ textAlign: "left" }}>Name</th>
+              <th style={{ textAlign: "right" }}>Price</th>
+              <th style={{ textAlign: "center" }}>Quantity</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {leftItems.map((item, index) => (
+              <tr key={index}>
+                <td>{item.name}</td>
+                <td style={{ textAlign: "right" }}>
+                  {item.price.toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                  })}
+                </td>
+                <td style={{ textAlign: "center" }}>
+                  <button onClick={() => handleQuantityChange(index, -1)}>
+                    -
+                  </button>
+                  <span style={{ margin: "0 8px" }}>{quantities[index]}</span>
+                  <button onClick={() => handleQuantityChange(index, 1)}>
+                    +
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {/* Right Column */}
+        <table style={{ flex: 1 }}>
+          <thead>
+            <tr>
+              <th style={{ textAlign: "left" }}>Name</th>
+              <th style={{ textAlign: "right" }}>Price</th>
+              <th style={{ textAlign: "center" }}>Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rightItems.map((item, index) => (
+              <tr key={mid + index}>
+                <td>{item.name}</td>
+                <td style={{ textAlign: "right" }}>
+                  {item.price.toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                  })}
+                </td>
+                <td style={{ textAlign: "center" }}>
+                  <button onClick={() => handleQuantityChange(mid + index, -1)}>
+                    -
+                  </button>
+                  <span style={{ margin: "0 8px" }}>
+                    {quantities[mid + index]}
+                  </span>
+                  <button onClick={() => handleQuantityChange(mid + index, 1)}>
+                    +
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <button onClick={handleGenerateReceipt}>Generate Receipt</button>
       <div style={{ marginTop: "24px" }}>
         <h3>Add New Item</h3>
