@@ -86,4 +86,8 @@ p {
   button {
     display: none !important;
   }
+
+  thead {
+    display: table-row;
+  }
 }
