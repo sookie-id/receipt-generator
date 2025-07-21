@@ -82,76 +82,22 @@ export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
 
   return (
     <>
-      <h2>Menu</h2>
       <div style={{ display: "flex", gap: "32px" }}>
-        {/* Left Column */}
-        <table style={{ flex: 1 }}>
-          <thead>
-            <tr>
-              <th style={{ textAlign: "left" }}>Name</th>
-              <th style={{ textAlign: "right" }}>Price</th>
-              <th style={{ textAlign: "center" }}>Quantity</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leftItems.map((item, index) => (
-              <tr key={index}>
-                <td>{item.name}</td>
-                <td style={{ textAlign: "right" }}>
-                  {item.price.toLocaleString("id-ID", {
-                    style: "currency",
-                    currency: "IDR",
-                  })}
-                </td>
-                <td style={{ textAlign: "center" }}>
-                  <button onClick={() => handleQuantityChange(index, -1)}>
-                    -
-                  </button>
-                  <span style={{ margin: "0 8px" }}>{quantities[index]}</span>
-                  <button onClick={() => handleQuantityChange(index, 1)}>
-                    +
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {/* Right Column */}
-        <table style={{ flex: 1 }}>
-          <thead>
-            <tr>
-              <th style={{ textAlign: "left" }}>Name</th>
-              <th style={{ textAlign: "right" }}>Price</th>
-              <th style={{ textAlign: "center" }}>Quantity</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rightItems.map((item, index) => (
-              <tr key={mid + index}>
-                <td>{item.name}</td>
-                <td style={{ textAlign: "right" }}>
-                  {item.price.toLocaleString("id-ID", {
-                    style: "currency",
-                    currency: "IDR",
-                  })}
-                </td>
-                <td style={{ textAlign: "center" }}>
-                  <button onClick={() => handleQuantityChange(mid + index, -1)}>
-                    -
-                  </button>
-                  <span style={{ margin: "0 8px" }}>
-                    {quantities[mid + index]}
-                  </span>
-                  <button onClick={() => handleQuantityChange(mid + index, 1)}>
-                    +
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <MenuColumn
+          items={leftItems}
+          startIndex={0}
+          quantities={quantities}
+          handleQuantityChange={handleQuantityChange}
+        />
+        <MenuColumn
+          items={rightItems}
+          startIndex={mid}
+          quantities={quantities}
+          handleQuantityChange={handleQuantityChange}
+        />
       </div>
       <button onClick={handleGenerateReceipt}>Generate Receipt</button>
+
       <div style={{ marginTop: "24px" }}>
         <h3>Add New Item</h3>
         <form
@@ -177,6 +123,48 @@ export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
         </form>
       </div>
     </>
+  );
+}
+
+function MenuColumn({ items, startIndex, quantities, handleQuantityChange }) {
+  return (
+    <table style={{ flex: 1 }}>
+      <thead>
+        <tr>
+          <th style={{ textAlign: "left" }}>Name</th>
+          <th style={{ textAlign: "right" }}>Price</th>
+          <th style={{ textAlign: "center" }}>Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+        {items.map((item, index) => (
+          <tr key={startIndex + index}>
+            <td>{item.name}</td>
+            <td style={{ textAlign: "right" }}>
+              {item.price.toLocaleString("id-ID", {
+                style: "currency",
+                currency: "IDR",
+              })}
+            </td>
+            <td style={{ textAlign: "center" }}>
+              <button
+                onClick={() => handleQuantityChange(startIndex + index, -1)}
+              >
+                -
+              </button>
+              <span style={{ margin: "0 8px" }}>
+                {quantities[startIndex + index]}
+              </span>
+              <button
+                onClick={() => handleQuantityChange(startIndex + index, 1)}
+              >
+                +
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
 
