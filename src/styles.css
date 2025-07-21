@@ -68,3 +68,7 @@ th, td {
   border: none;
   cursor: pointer;
 }
+
+p {
+  font-size: 16px;
+}

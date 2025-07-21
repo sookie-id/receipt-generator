@@ -195,6 +195,33 @@ function Receipt({ purchasedItems, total, onClose }) {
       <div style={{ display: "flex", justifyContent: "center" }}>
         <img src="/logo.png" alt="Logo" style={{ width: "200px" }} />
       </div>
+      <div
+        style={{ fontFamily: "Robotto", textAlign: "center", margin: "16px 0" }}
+      >
+        <p>Jl. Kebagusan Raya No. 17, Pasar Minggu, Jakarta Selatan</p>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          margin: "16px 0",
+        }}
+      >
+        <span style={{ fontFamily: "Robotto" }}>
+          {new Date().toLocaleDateString("id-ID", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </span>
+        <span style={{ fontFamily: "Robotto" }}>
+          {new Date().toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          })}
+        </span>
+      </div>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
@@ -221,11 +248,34 @@ function Receipt({ purchasedItems, total, onClose }) {
               Total
             </td>
             <td style={{ textAlign: "right", fontWeight: "bold" }}>
-              {total.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
+              {total.toLocaleString("id-ID", {
+                style: "currency",
+                currency: "IDR",
+              })}
             </td>
           </tr>
         </tbody>
       </table>
+      <div
+        style={{
+          fontFamily: "Robotto",
+          lineHeight: "1.2",
+          margin: "24px 0",
+          textAlign: "center",
+          fontSize: "1.1em",
+        }}
+      >
+        <p>
+          Terima kasih! Selamat menikmati.
+          <br />
+          Ditunggu kedatangannya kembali.
+        </p>
+        <p>
+          Kritik dan Saran:
+          <br />
+          0831 0729 4243 / Instagram: @sookie_id
+        </p>
+      </div>
       <button onClick={onClose}>Close</button>
     </div>
   );
