@@ -60,7 +60,7 @@ th, td {
   padding: 10px 10px;
 }
 
-#generate-receipt {
+.primary-button {
   margin-top: 20px;
   padding: 10px 20px;
   background-color: #007bff;
@@ -69,6 +69,21 @@ th, td {
   cursor: pointer;
 }
 
+.secondary-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
 p {
   font-size: 16px;
+}
+
+@media print {
+  button {
+    display: none !important;
+  }
 }

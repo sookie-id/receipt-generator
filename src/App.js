@@ -99,7 +99,7 @@ export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
           handleQuantityChange={handleQuantityChange}
         />
       </div>
-      <button id="generate-receipt" onClick={handleGenerateReceipt}>
+      <button className="primary-button" onClick={handleGenerateReceipt}>
         Generate Receipt
       </button>
 
@@ -278,7 +278,10 @@ function Receipt({ purchasedItems, total, onClose }) {
           0831 0729 4243 / Instagram: @sookie_id
         </p>
       </div>
-      <button onClick={onClose}>Close</button>
+      <div style={{ display: "flex", gap: "12px", justifyContent: "center", marginTop: "16px" }}>
+        <button className="primary-button" onClick={() => window.print()}>Print</button>
+        <button className="secondary-button" onClick={onClose}>Close</button>
+      </div>
     </div>
   );
 }
