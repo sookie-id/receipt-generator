@@ -1,4 +1,6 @@
 import { useState } from "react";
+import logo from "./logo.png";
+
 
 const defaultItemList = [
   { name: "Soft Cookie 1 pcs", price: 20_000 },
@@ -193,7 +195,7 @@ function Receipt({ purchasedItems, total, onClose }) {
   return (
     <div className="receipt" style={{ maxWidth: "456px", margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <img src="./logo.png" alt="Logo" style={{ width: "200px" }} />
+        <img src={logo} alt="Logo" style={{ width: "200px" }} />
       </div>
       <div
         style={{ fontFamily: "Robotto", textAlign: "center", margin: "16px 0" }}
