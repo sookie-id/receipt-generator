@@ -18,8 +18,9 @@ const defaultItemList = [
 
 export default function App() {
   const [receiptData, setReceiptData] = useState(null);
-  const itemList =
-    JSON.parse(localStorage.getItem("itemList")) || defaultItemList;
+  const [itemList, setItemList] = useState(
+    JSON.parse(localStorage.getItem("itemList")) || defaultItemList
+  );
 
   return (
     <div className="app">
@@ -30,13 +31,17 @@ export default function App() {
           onClose={() => setReceiptData(null)}
         />
       ) : (
-        <Menu onGenerateReceipt={setReceiptData} itemList={itemList} />
+        <Menu
+          onGenerateReceipt={setReceiptData}
+          itemList={itemList}
+          onAddItem={setItemList}
+        />
       )}
     </div>
   );
 }
 
-export function Menu({ onGenerateReceipt, itemList }) {
+export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
   const [quantities, setQuantities] = useState(Array(itemList.length).fill(0));
 
   const handleQuantityChange = (index, delta) => {
@@ -59,20 +64,67 @@ export function Menu({ onGenerateReceipt, itemList }) {
     onGenerateReceipt({ purchasedItems, total });
   };
 
+  const handleAddItem = (e) => {
+    e.preventDefault();
+    const name = e.target.itemName.value.trim();
+    const price = Number(e.target.itemPrice.value);
+    if (!name || !price || price <= 0) return;
+    const newItemList = [...itemList, { name, price }];
+    onAddItem(newItemList);
+    localStorage.setItem("itemList", JSON.stringify(newItemList));
+    e.target.reset();
+  };
+
   return (
     <>
       <h2>Menu</h2>
-      <ul>
-        {itemList.map((item, index) => (
-          <li key={index}>
-            {item.name} - Rp{item.price.toLocaleString()} &nbsp;
-            <button onClick={() => handleQuantityChange(index, -1)}>-</button>
-            <span style={{ margin: "0 8px" }}>{quantities[index]}</span>
-            <button onClick={() => handleQuantityChange(index, 1)}>+</button>
-          </li>
-        ))}
-      </ul>
+      <table>
+        <thead>
+          <tr>
+            <th style={{ textAlign: "left" }}>Name</th>
+            <th style={{ textAlign: "right" }}>Price</th>
+            <th style={{ textAlign: "center" }}>Quantity</th>
+          </tr>
+        </thead>
+        <tbody>
+          {itemList.map((item, index) => (
+            <tr key={index}>
+              <td>{item.name}</td>
+              <td style={{ textAlign: "right" }}>Rp{item.price.toLocaleString()}</td>
+              <td>
+                <button onClick={() => handleQuantityChange(index, -1)}>-</button>
+                <span style={{ margin: "0 8px" }}>{quantities[index]}</span>
+                <button onClick={() => handleQuantityChange(index, 1)}>+</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <button onClick={handleGenerateReceipt}>Generate Receipt</button>
+      <div style={{ marginTop: "24px" }}>
+        <h3>Add New Item</h3>
+        <form
+          onSubmit={(e) => handleAddItem(e)}
+          style={{ display: "flex", gap: "8px", alignItems: "center" }}
+        >
+          <input
+            name="itemName"
+            type="text"
+            placeholder="Item name"
+            required
+            style={{ flex: 1 }}
+          />
+          <input
+            name="itemPrice"
+            type="number"
+            placeholder="Price"
+            min="1"
+            required
+            style={{ width: "100px" }}
+          />
+          <button type="submit">Add Item</button>
+        </form>
+      </div>
     </>
   );
 }
@@ -84,11 +136,18 @@ function Receipt({ purchasedItems, total, onClose }) {
       <ul>
         {purchasedItems.map((item, idx) => (
           <li key={idx}>
-            {item.name} x {item.quantity} = {item.subtotal.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
+            {item.name} x {item.quantity} ={" "}
+            {item.subtotal.toLocaleString("id-ID", {
+              style: "currency",
+              currency: "IDR",
+            })}
           </li>
         ))}
       </ul>
-      <h3>Total: {total.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</h3>
+      <h3>
+        Total:{" "}
+        {total.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
+      </h3>
       <button onClick={onClose}>Close</button>
     </div>
   );
