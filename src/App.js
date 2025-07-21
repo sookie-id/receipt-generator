@@ -193,7 +193,7 @@ function Receipt({ purchasedItems, total, onClose }) {
   return (
     <div className="receipt" style={{ maxWidth: "456px", margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <img src="/logo.png" alt="Logo" style={{ width: "200px" }} />
+        <img src="./logo.png" alt="Logo" style={{ width: "200px" }} />
       </div>
       <div
         style={{ fontFamily: "Robotto", textAlign: "center", margin: "16px 0" }}
