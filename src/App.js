@@ -81,7 +81,7 @@ export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
   const rightItems = itemList.slice(mid);
 
   return (
-    <>
+    <div className="menu" style={{ maxWidth: "1000px", margin: "0 auto" }}>
       <h2>Menu</h2>
       <div style={{ display: "flex", gap: "32px" }}>
         <MenuColumn
@@ -97,7 +97,9 @@ export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
           handleQuantityChange={handleQuantityChange}
         />
       </div>
-      <button id="generate-receipt" onClick={handleGenerateReceipt}>Generate Receipt</button>
+      <button id="generate-receipt" onClick={handleGenerateReceipt}>
+        Generate Receipt
+      </button>
 
       <div style={{ marginTop: "24px" }}>
         <h3>Add New Item</h3>
@@ -123,14 +125,15 @@ export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
           <button type="submit">Add Item</button>
         </form>
       </div>
-    </>
+    </div>
   );
 }
 
 function MenuColumn({ items, startIndex, quantities, handleQuantityChange }) {
   const handleDelete = (globalIndex) => {
     if (window.confirm("Are you sure you want to delete this item?")) {
-      const updatedItemList = JSON.parse(localStorage.getItem("itemList")) || [];
+      const updatedItemList =
+        JSON.parse(localStorage.getItem("itemList")) || [];
       updatedItemList.splice(globalIndex, 1);
       localStorage.setItem("itemList", JSON.stringify(updatedItemList));
       window.location.reload();
@@ -188,23 +191,41 @@ function MenuColumn({ items, startIndex, quantities, handleQuantityChange }) {
 
 function Receipt({ purchasedItems, total, onClose }) {
   return (
-    <div className="receipt">
-      <h2>Receipt</h2>
-      <ul>
-        {purchasedItems.map((item, idx) => (
-          <li key={idx}>
-            {item.name} x {item.quantity} ={" "}
-            {item.subtotal.toLocaleString("id-ID", {
-              style: "currency",
-              currency: "IDR",
-            })}
-          </li>
-        ))}
-      </ul>
-      <h3>
-        Total:{" "}
-        {total.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
-      </h3>
+    <div className="receipt" style={{ maxWidth: "456px", margin: "0 auto" }}>
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <img src="/logo.png" alt="Logo" style={{ width: "200px" }} />
+      </div>
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th style={{ textAlign: "left" }}>Item</th>
+            <th style={{ textAlign: "center" }}>Quantity</th>
+            <th style={{ textAlign: "right" }}>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {purchasedItems.map((item, idx) => (
+            <tr key={idx}>
+              <td>{item.name}</td>
+              <td style={{ textAlign: "center" }}>{item.quantity}</td>
+              <td style={{ textAlign: "right" }}>
+                {item.subtotal.toLocaleString("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                })}
+              </td>
+            </tr>
+          ))}
+          <tr>
+            <td colSpan={2} style={{ textAlign: "left", fontWeight: "bold" }}>
+              Total
+            </td>
+            <td style={{ textAlign: "right", fontWeight: "bold" }}>
+              {total.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <button onClick={onClose}>Close</button>
     </div>
   );
