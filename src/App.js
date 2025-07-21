@@ -82,6 +82,7 @@ export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
 
   return (
     <>
+      <h2>Menu</h2>
       <div style={{ display: "flex", gap: "32px" }}>
         <MenuColumn
           items={leftItems}
@@ -96,7 +97,7 @@ export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
           handleQuantityChange={handleQuantityChange}
         />
       </div>
-      <button onClick={handleGenerateReceipt}>Generate Receipt</button>
+      <button id="generate-receipt" onClick={handleGenerateReceipt}>Generate Receipt</button>
 
       <div style={{ marginTop: "24px" }}>
         <h3>Add New Item</h3>
@@ -109,7 +110,7 @@ export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
             type="text"
             placeholder="Item name"
             required
-            style={{ flex: 1 }}
+            style={{ width: "160px" }}
           />
           <input
             name="itemPrice"
