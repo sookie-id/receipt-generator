@@ -127,6 +127,15 @@ export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
 }
 
 function MenuColumn({ items, startIndex, quantities, handleQuantityChange }) {
+  const handleDelete = (globalIndex) => {
+    if (window.confirm("Are you sure you want to delete this item?")) {
+      const updatedItemList = JSON.parse(localStorage.getItem("itemList")) || [];
+      updatedItemList.splice(globalIndex, 1);
+      localStorage.setItem("itemList", JSON.stringify(updatedItemList));
+      window.location.reload();
+    }
+  };
+
   return (
     <table style={{ flex: 1 }}>
       <thead>
@@ -163,18 +172,7 @@ function MenuColumn({ items, startIndex, quantities, handleQuantityChange }) {
             </td>
             <td>
               <button
-                onClick={() => {
-                  const newItems = items
-                    .slice(0, index)
-                    .concat(items.slice(index + 1));
-                  const globalIndex = startIndex + index;
-                  // Remove item from global itemList and update localStorage
-                  const updatedItemList = JSON.parse(localStorage.getItem("itemList")) || [];
-                  updatedItemList.splice(globalIndex, 1);
-                  localStorage.setItem("itemList", JSON.stringify(updatedItemList));
-                  // Update parent state
-                  window.location.reload(); // Quick way to refresh state, or use a callback prop to update itemList
-                }}
+                onClick={() => handleDelete(startIndex + index)}
                 title="Delete item"
               >
                 🗑️
