@@ -1,6 +1,7 @@
 import { useState } from "react";
 import logo from "./logo.png";
-
+import html2canvas from "html2canvas";
+import { useRef } from "react";
 
 const defaultItemList = [
   { name: "Soft Cookie 1 pcs", price: 20_000 },
@@ -192,9 +193,52 @@ function MenuColumn({ items, startIndex, quantities, handleQuantityChange }) {
 }
 
 function Receipt({ purchasedItems, total, onClose }) {
+  const receiptRef = useRef(null);
+
+  const handleCopy = async () => {
+    const buttons = receiptRef.current.querySelectorAll("button");
+
+    // Hide buttons
+    buttons.forEach((btn) => (btn.style.visibility = "hidden"));
+
+    // Wait for DOM update
+    await new Promise((r) => setTimeout(r, 100));
+
+    // Export receipt as image
+    const canvas = await html2canvas(receiptRef.current, { scale: 2 });
+    const imgData = canvas.toDataURL("image/png");
+
+    // Restore buttons
+    buttons.forEach((btn) => (btn.style.visibility = ""));
+
+    // Convert base64 image to blob
+    const response = await fetch(imgData);
+    const blob = await response.blob();
+
+    try {
+      // Write image to clipboard
+      await navigator.clipboard.write([
+        new ClipboardItem({ [blob.type]: blob }),
+      ]);
+      console.log("Image copied to clipboard successfully!");
+      alert(
+        "Receipt image copied to clipboard. You can now paste it into WhatsApp."
+      );
+    } catch (err) {
+      console.error("Failed to copy image to clipboard:", err);
+      alert("Failed to copy image. Please try again or use download instead.");
+    }
+  };
+
   return (
-    <div className="receipt" style={{ maxWidth: "250px", margin: "0 auto" }}>
-      <div style={{ display: "flex", marginTop: "50px", justifyContent: "center" }}>
+    <div
+      className="receipt"
+      style={{ maxWidth: "250px", margin: "0 auto", padding: "30px 0px 0" }}
+      ref={receiptRef}
+    >
+      <div
+        style={{ display: "flex", justifyContent: "center" }}
+      >
         <img src={logo} alt="Logo" style={{ width: "200px" }} />
       </div>
       <div
@@ -206,7 +250,7 @@ function Receipt({ purchasedItems, total, onClose }) {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          margin: "16px 0",
+          margin: "16px 10px",
         }}
       >
         <span style={{ fontFamily: "Robotto" }}>
@@ -278,9 +322,23 @@ function Receipt({ purchasedItems, total, onClose }) {
           0831 0729 4243 / Instagram: @sookie_id
         </p>
       </div>
-      <div style={{ display: "flex", gap: "12px", justifyContent: "center", marginTop: "16px" }}>
-        <button className="primary-button" onClick={() => window.print()}>Print</button>
-        <button className="secondary-button" onClick={onClose}>Close</button>
+      <div
+        style={{
+          display: "flex",
+          gap: "12px",
+          justifyContent: "center",
+          marginTop: "16px",
+        }}
+      >
+        <button className="primary-button" onClick={() => window.print()}>
+          Print
+        </button>
+        <button className="primary-button" onClick={handleCopy}>
+          Copy
+        </button>
+        <button className="secondary-button" onClick={onClose}>
+          Close
+        </button>
       </div>
     </div>
   );
