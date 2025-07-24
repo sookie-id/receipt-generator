@@ -30,7 +30,7 @@ export default function App() {
       {receiptData ? (
         <Receipt
           purchasedItems={receiptData.purchasedItems}
-          total={receiptData.total}
+          receiptData={receiptData}
           onClose={() => setReceiptData(null)}
         />
       ) : (
@@ -46,6 +46,7 @@ export default function App() {
 
 export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
   const [quantities, setQuantities] = useState(Array(itemList.length).fill(0));
+  const [discount, setDiscount] = useState(0);
 
   const handleQuantityChange = (index, delta) => {
     setQuantities((prev) =>
@@ -63,8 +64,16 @@ export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
       .filter((item) => item.quantity > 0);
 
     const total = purchasedItems.reduce((sum, item) => sum + item.subtotal, 0);
+    const discountAmount = total * (discount / 100);
+    const totalAfterDiscount = total - discountAmount;
 
-    onGenerateReceipt({ purchasedItems, total });
+    onGenerateReceipt({
+      purchasedItems,
+      total,
+      discount,
+      discountAmount,
+      totalAfterDiscount,
+    });
   };
 
   const handleAddItem = (e) => {
@@ -99,6 +108,19 @@ export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
           quantities={quantities}
           handleQuantityChange={handleQuantityChange}
         />
+      </div>
+      <div style={{ marginTop: "24px", display: "flex", gap: "16px" }}>
+        <label>
+          Discount (%):
+          <input
+            type="number"
+            min="0"
+            max="100"
+            value={discount}
+            onChange={(e) => setDiscount(Number(e.target.value))}
+            style={{ width: "60px", marginLeft: "8px" }}
+          />
+        </label>
       </div>
       <button className="primary-button" onClick={handleGenerateReceipt}>
         Generate Receipt
@@ -192,8 +214,10 @@ function MenuColumn({ items, startIndex, quantities, handleQuantityChange }) {
   );
 }
 
-function Receipt({ purchasedItems, total, onClose }) {
+function Receipt({ purchasedItems, receiptData, onClose }) {
   const receiptRef = useRef(null);
+
+  const { total, discount, discountAmount, totalAfterDiscount } = receiptData;
 
   const handleCopy = async () => {
     const buttons = receiptRef.current.querySelectorAll("button");
@@ -236,9 +260,7 @@ function Receipt({ purchasedItems, total, onClose }) {
       style={{ maxWidth: "250px", margin: "0 auto", padding: "30px 0px 0" }}
       ref={receiptRef}
     >
-      <div
-        style={{ display: "flex", justifyContent: "center" }}
-      >
+      <div style={{ display: "flex", justifyContent: "center" }}>
         <img src={logo} alt="Logo" style={{ width: "200px" }} />
       </div>
       <div
@@ -300,6 +322,36 @@ function Receipt({ purchasedItems, total, onClose }) {
               })}
             </td>
           </tr>
+          {discount > 0 && (
+            <>
+              <tr>
+                <td colSpan={2} style={{ textAlign: "left" }}>
+                  Discount ({discount}%)
+                </td>
+                <td style={{ textAlign: "right", color: "red" }}>
+                  -
+                  {discountAmount.toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                  })}
+                </td>
+              </tr>
+              <tr>
+                <td
+                  colSpan={2}
+                  style={{ textAlign: "left", fontWeight: "bold" }}
+                >
+                  Total After Discount
+                </td>
+                <td style={{ textAlign: "right", fontWeight: "bold" }}>
+                  {totalAfterDiscount.toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                  })}
+                </td>
+              </tr>
+            </>
+          )}
         </tbody>
       </table>
       <div
