@@ -122,7 +122,11 @@ export function Menu({ onGenerateReceipt, itemList, onAddItem }) {
           />
         </label>
       </div>
-      <button className="primary-button" onClick={handleGenerateReceipt}>
+      <button
+        className="primary-button"
+        onClick={handleGenerateReceipt}
+        style={{ marginTop: "16px" }}
+      >
         Generate Receipt
       </button>
 
@@ -217,23 +221,14 @@ function MenuColumn({ items, startIndex, quantities, handleQuantityChange }) {
 function Receipt({ purchasedItems, receiptData, onClose }) {
   const receiptRef = useRef(null);
 
+  const [phone, setPhone] = useState("");
+
   const { total, discount, discountAmount, totalAfterDiscount } = receiptData;
 
-  const handleCopy = async () => {
-    const buttons = receiptRef.current.querySelectorAll("button");
-
-    // Hide buttons
-    buttons.forEach((btn) => (btn.style.visibility = "hidden"));
-
-    // Wait for DOM update
-    await new Promise((r) => setTimeout(r, 100));
-
+  const handleSendToWhatsApp = async () => {
     // Export receipt as image
     const canvas = await html2canvas(receiptRef.current, { scale: 2 });
     const imgData = canvas.toDataURL("image/png");
-
-    // Restore buttons
-    buttons.forEach((btn) => (btn.style.visibility = ""));
 
     // Convert base64 image to blob
     const response = await fetch(imgData);
@@ -244,154 +239,188 @@ function Receipt({ purchasedItems, receiptData, onClose }) {
       await navigator.clipboard.write([
         new ClipboardItem({ [blob.type]: blob }),
       ]);
-      console.log("Image copied to clipboard successfully!");
-      alert(
-        "Receipt image copied to clipboard. You can now paste it into WhatsApp."
-      );
     } catch (err) {
-      console.error("Failed to copy image to clipboard:", err);
+      console.error("Failed to copy image:", err);
       alert("Failed to copy image. Please try again or use download instead.");
     }
+
+    // Open WhatsApp with phone number
+    let phoneNumber = phone.trim();
+    if (!phoneNumber) return;
+
+    if (phoneNumber.startsWith("0")) {
+      phoneNumber = "62" + phoneNumber.slice(1);
+    }
+    const waUrl = `https://wa.me/${phoneNumber.replace(/\D/g, "")}`;
+    window.open(waUrl, "_blank");
   };
 
   return (
-    <div
-      className="receipt"
-      style={{ maxWidth: "250px", margin: "0 auto", padding: "30px 0px 0" }}
-      ref={receiptRef}
-    >
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <img src={logo} alt="Logo" style={{ width: "200px" }} />
-      </div>
+    <>
       <div
-        style={{ fontFamily: "Robotto", textAlign: "center", margin: "16px 0" }}
+        className="receipt"
+        style={{ maxWidth: "250px", margin: "0 auto", padding: "30px 0px" }}
+        ref={receiptRef}
       >
-        <p>Jl. Kebagusan Raya No. 17, Pasar Minggu, Jakarta Selatan</p>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          margin: "16px 10px",
-        }}
-      >
-        <span style={{ fontFamily: "Robotto" }}>
-          {new Date().toLocaleDateString("id-ID", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
-        </span>
-        <span style={{ fontFamily: "Robotto" }}>
-          {new Date().toLocaleTimeString("id-ID", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          })}
-        </span>
-      </div>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={{ textAlign: "left" }}>Item</th>
-            <th style={{ textAlign: "center" }}>Qty</th>
-            <th style={{ textAlign: "right" }}>Subtotal</th>
-          </tr>
-        </thead>
-        <tbody>
-          {purchasedItems.map((item, idx) => (
-            <tr key={idx}>
-              <td>{item.name}</td>
-              <td style={{ textAlign: "center" }}>{item.quantity}</td>
-              <td style={{ textAlign: "right" }}>
-                {item.subtotal.toLocaleString("id-ID", {
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <img src={logo} alt="Logo" style={{ width: "200px" }} />
+        </div>
+        <div
+          style={{
+            fontFamily: "Robotto",
+            textAlign: "center",
+            margin: "16px 0",
+          }}
+        >
+          <p>Jl. Kebagusan Raya No. 17, Pasar Minggu, Jakarta Selatan</p>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            margin: "16px 10px",
+          }}
+        >
+          <span style={{ fontFamily: "Robotto" }}>
+            {new Date().toLocaleDateString("id-ID", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </span>
+          <span style={{ fontFamily: "Robotto" }}>
+            {new Date().toLocaleTimeString("id-ID", {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })}
+          </span>
+        </div>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={{ textAlign: "left" }}>Item</th>
+              <th style={{ textAlign: "center" }}>Qty</th>
+              <th style={{ textAlign: "right" }}>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {purchasedItems.map((item, idx) => (
+              <tr key={idx}>
+                <td>{item.name}</td>
+                <td style={{ textAlign: "center" }}>{item.quantity}</td>
+                <td style={{ textAlign: "right" }}>
+                  {item.subtotal.toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                  })}
+                </td>
+              </tr>
+            ))}
+            <tr>
+              <td colSpan={2} style={{ textAlign: "left", fontWeight: "bold" }}>
+                Total
+              </td>
+              <td style={{ textAlign: "right", fontWeight: "bold" }}>
+                {total.toLocaleString("id-ID", {
                   style: "currency",
                   currency: "IDR",
                 })}
               </td>
             </tr>
-          ))}
-          <tr>
-            <td colSpan={2} style={{ textAlign: "left", fontWeight: "bold" }}>
-              Total
-            </td>
-            <td style={{ textAlign: "right", fontWeight: "bold" }}>
-              {total.toLocaleString("id-ID", {
-                style: "currency",
-                currency: "IDR",
-              })}
-            </td>
-          </tr>
-          {discount > 0 && (
-            <>
-              <tr>
-                <td colSpan={2} style={{ textAlign: "left" }}>
-                  Discount ({discount}%)
-                </td>
-                <td style={{ textAlign: "right", color: "red" }}>
-                  -
-                  {discountAmount.toLocaleString("id-ID", {
-                    style: "currency",
-                    currency: "IDR",
-                  })}
-                </td>
-              </tr>
-              <tr>
-                <td
-                  colSpan={2}
-                  style={{ textAlign: "left", fontWeight: "bold" }}
-                >
-                  Total After Discount
-                </td>
-                <td style={{ textAlign: "right", fontWeight: "bold" }}>
-                  {totalAfterDiscount.toLocaleString("id-ID", {
-                    style: "currency",
-                    currency: "IDR",
-                  })}
-                </td>
-              </tr>
-            </>
-          )}
-        </tbody>
-      </table>
-      <div
-        style={{
-          fontFamily: "Robotto",
-          lineHeight: "1.2",
-          margin: "24px 0",
-          textAlign: "center",
-          fontSize: "1.1em",
-        }}
-      >
-        <p>
-          Terima kasih! Selamat menikmati.
-          <br />
-          Ditunggu kedatangannya kembali.
-        </p>
-        <p>
-          Kritik dan Saran:
-          <br />
-          0831 0729 4243 / Instagram: @sookie_id
-        </p>
+            {discount > 0 && (
+              <>
+                <tr>
+                  <td colSpan={2} style={{ textAlign: "left" }}>
+                    Discount ({discount}%)
+                  </td>
+                  <td style={{ textAlign: "right", color: "red" }}>
+                    -
+                    {discountAmount.toLocaleString("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    })}
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    colSpan={2}
+                    style={{ textAlign: "left", fontWeight: "bold" }}
+                  >
+                    Total After Discount
+                  </td>
+                  <td style={{ textAlign: "right", fontWeight: "bold" }}>
+                    {totalAfterDiscount.toLocaleString("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    })}
+                  </td>
+                </tr>
+              </>
+            )}
+          </tbody>
+        </table>
+        <div
+          style={{
+            fontFamily: "Robotto",
+            lineHeight: "1.2",
+            margin: "24px 0",
+            textAlign: "center",
+            fontSize: "1.1em",
+          }}
+        >
+          <p>
+            Terima kasih! Selamat menikmati.
+            <br />
+            Ditunggu kedatangannya kembali.
+          </p>
+          <p>
+            Kritik dan Saran:
+            <br />
+            0831 0729 4243 / Instagram: @sookie_id
+          </p>
+        </div>
       </div>
       <div
-        style={{
-          display: "flex",
-          gap: "12px",
-          justifyContent: "center",
-          marginTop: "16px",
-        }}
+        className="receipt-actions"
+        style={{ textAlign: "center", marginTop: "16px" }}
       >
-        <button className="primary-button" onClick={() => window.print()}>
-          Print
-        </button>
-        <button className="primary-button" onClick={handleCopy}>
-          Copy
-        </button>
-        <button className="secondary-button" onClick={onClose}>
-          Close
-        </button>
+        <div
+          style={{
+            display: "flex",
+            gap: "12px",
+            justifyContent: "center",
+          }}
+        >
+          <button className="primary-button" onClick={() => window.print()}>
+            Print
+          </button>
+          <button className="secondary-button" onClick={onClose}>
+            Close
+          </button>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            gap: "12px",
+            justifyContent: "center",
+            marginTop: "16px",
+          }}
+        >
+          <input
+            name="phone"
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="Phone number"
+            required
+            style={{ width: "140px" }}
+          />
+          <button className="primary-button" onClick={handleSendToWhatsApp}>
+            Send to WhatsApp
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
